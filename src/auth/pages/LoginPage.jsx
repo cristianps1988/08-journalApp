@@ -11,9 +11,7 @@ export const LoginPage = () => {
 
     const { status, errorMessage } = useSelector(state => state.auth)
 
-
     const dispatch = useDispatch()
-
 
 
     const { email, password, onInputChange } = useForm({
@@ -35,6 +33,7 @@ export const LoginPage = () => {
     return (
         <AuthLayout title='Login!'>
             <form
+                className='animate__animated animate__fadeIn animate__faster'
                 onSubmit={onSubmit}
             >
                 <Grid container>
