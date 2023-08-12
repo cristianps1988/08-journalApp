@@ -1,10 +1,10 @@
-import { SaveOutlined } from '@mui/icons-material'
-import { Button, Grid, TextField, Typography } from '@mui/material'
-import React, { useEffect, useMemo } from 'react'
+import { SaveOutlined, UploadOutlined } from '@mui/icons-material'
+import { Button, ButtonBase, Grid, IconButton, TextField, Typography } from '@mui/material'
+import React, { useEffect, useMemo, useRef } from 'react'
 import { ImageGallery } from '../components'
 import { useForm } from '../../hooks/useForm'
 import { useDispatch, useSelector } from 'react-redux'
-import { setActiveNote, startSaveNote } from '../../store/journalSlice'
+import { setActiveNote, startSaveNote, startSavingImage } from '../../store/journalSlice'
 import Swal from 'sweetalert2'
 import 'sweetalert2/dist/sweetalert2.css'
 
@@ -19,6 +19,8 @@ export const NoteView = () => {
         const newDate = new Date(date)
         return newDate.toUTCString()
     })
+
+    const fileInputRef = useRef()
 
     useEffect(() => {
         dispatch(setActiveNote(formState))
@@ -36,6 +38,12 @@ export const NoteView = () => {
         dispatch(startSaveNote())
     }
 
+    const onFileInputChange = ({ target }) => {
+        if (target.files === 0) return
+
+        dispatch(startSavingImage(target.files))
+    }
+
 
     return (
         <Grid className='animate__animated animate__fadeIn animate__faster' container direction='row' justifyContent='space-between' alignItems='center' sx={{ mb: 1 }}>
@@ -43,6 +51,19 @@ export const NoteView = () => {
                 <Typography fontSize={39} fontWeight='light'>{dateString}</Typography>
             </Grid>
             <Grid item>
+                <input
+                    type='file'
+                    multiple
+                    onChange={onFileInputChange}
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                />
+                <IconButton
+                    color='primary'
+                    disabled={isSaving}
+                    onClick={() => fileInputRef.current.click()}>
+                    <UploadOutlined />
+                </IconButton>
                 <Button disabled={isSaving} onClick={onSaveNote} color='primary' sx={{ padding: 2 }}>
                     <SaveOutlined sx={{ fontSize: 30, mr: 1 }} />
                     Guardar
@@ -72,7 +93,7 @@ export const NoteView = () => {
                     onChange={onInputChange}
                 />
             </Grid>
-            <ImageGallery />
+            <ImageGallery images={note.imageUrls} />
 
         </Grid>
     )
